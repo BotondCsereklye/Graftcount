@@ -389,6 +389,13 @@ class _GraftPageState extends State<GraftPage> {
     return trimmed.isEmpty ? '-' : trimmed;
   }
 
+  Future<pw.ThemeData> _loadPdfTheme() async {
+    final baseFont = await PdfGoogleFonts.notoSansRegular();
+    final boldFont = await PdfGoogleFonts.notoSansBold();
+
+    return pw.ThemeData.withFont(base: baseFont, bold: boldFont);
+  }
+
   Future<void> _saveData() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('name', nameController.text);
