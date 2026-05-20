@@ -346,6 +346,49 @@ class _GraftPageState extends State<GraftPage> {
     return totalHairForDay(day) / g;
   }
 
+  int _graftValue(int day, int petri, int row) {
+    return int.tryParse(grafts[day][petri][row].text) ?? 0;
+  }
+
+  String _graftText(int day, int petri, int row) {
+    return grafts[day][petri][row].text.trim();
+  }
+
+  int _hairValue(int day, int petri, int row) {
+    return _graftValue(day, petri, row) * hairMultiplier(row);
+  }
+
+  int _totalGraftsForDish(int day, int petri) {
+    int sum = 0;
+    for (int row = 0; row < 6; row++) {
+      sum += _graftValue(day, petri, row);
+    }
+    return sum;
+  }
+
+  int _totalHairForDish(int day, int petri) {
+    int sum = 0;
+    for (int row = 0; row < 6; row++) {
+      sum += _hairValue(day, petri, row);
+    }
+    return sum;
+  }
+
+  double _ratioForDish(int day, int petri) {
+    final totalGrafts = _totalGraftsForDish(day, petri);
+    if (totalGrafts == 0) return 0;
+    return _totalHairForDish(day, petri) / totalGrafts;
+  }
+
+  String _ratioText(int graftCount, double value) {
+    return graftCount == 0 ? '-' : value.toStringAsFixed(2);
+  }
+
+  String _textOrDash(String value) {
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? '-' : trimmed;
+  }
+
   Future<void> _saveData() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('name', nameController.text);
