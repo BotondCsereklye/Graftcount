@@ -396,6 +396,293 @@ class _GraftPageState extends State<GraftPage> {
     return pw.ThemeData.withFont(base: baseFont, bold: boldFont);
   }
 
+  Future<Uint8List> _buildReportPdf(PdfPageFormat format) async {
+    final pdfTheme = await _pdfThemeFuture;
+    final pdf = pw.Document(
+      version: PdfVersion.pdf_1_5,
+      compress: true,
+      theme: pdfTheme,
+      title: 'Graft Zähler Bericht',
+    );
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4.landscape,
+        margin: const pw.EdgeInsets.all(18),
+        build: (pdfContext) {
+          return _buildReportPage();
+        },
+      ),
+    );
+
+    return pdf.save();
+  }
+
+  pw.Widget _buildReportPage() {
+    return pw.Container(
+      decoration: pw.BoxDecoration(
+        border: pw.Border.all(color: PdfColors.grey600, width: 1),
+      ),
+      padding: const pw.EdgeInsets.all(18),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+        children: [
+          pw.Center(
+            child: pw.Text(
+              _textOrDash(nameController.text),
+              style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+            ),
+          ),
+          pw.SizedBox(height: 16),
+          pw.Row(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Expanded(child: _buildPrintDaySection(0)),
+              pw.Padding(
+                padding: const pw.EdgeInsets.symmetric(horizontal: 10),
+                child: pw.Container(
+                  width: 1.5,
+                  height: 316,
+                  color: PdfColors.black,
+                ),
+              ),
+              pw.Expanded(child: _buildPrintDaySection(1)),
+            ],
+          ),
+          pw.SizedBox(height: 18),
+          _buildOverallPrintSummary(),
+          pw.SizedBox(height: 18),
+          pw.Text(
+            'Entnahmenadel: ${_textOrDash(needleController.text)}',
+            style: const pw.TextStyle(fontSize: 14),
+          ),
+        ],
+      ),
+    );
+  }
+
+  pw.Widget _buildPrintDaySection(int day) {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+      children: [
+        pw.Center(
+          child: pw.Text(
+            'Tag ${day + 1}.',
+            style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+          ),
+        ),
+        pw.SizedBox(height: 8),
+        _buildPrintDishHeaderRow(),
+        _buildPrintDayTable(day),
+        pw.SizedBox(height: 10),
+        pw.Row(
+          children: [
+            pw.Text(
+              'Zusammen:',
+              style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.SizedBox(width: 8),
+            pw.Text(
+              '${totalGraftsForDay(day)}',
+              style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.SizedBox(width: 4),
+            pw.Text('Grafts,', style: const pw.TextStyle(fontSize: 11)),
+            pw.SizedBox(width: 8),
+            pw.Text(
+              '${totalHairForDay(day)}',
+              style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.SizedBox(width: 4),
+            pw.Text('Haare', style: const pw.TextStyle(fontSize: 11)),
+          ],
+        ),
+        pw.SizedBox(height: 4),
+        pw.Row(
+          children: [
+            pw.Text(
+              'Verhältnis:',
+              style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold),
+            ),
+            pw.SizedBox(width: 8),
+            pw.Text(
+              _ratioText(totalGraftsForDay(day), ratioForDay(day)),
+              style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  pw.Widget _buildPrintDishHeaderRow() {
+    return pw.Row(
+      children: [
+        pw.SizedBox(width: 24),
+        for (int dish = 0; dish < 3; dish++)
+          pw.Expanded(
+            child: pw.Container(
+              alignment: pw.Alignment.center,
+              padding: const pw.EdgeInsets.symmetric(vertical: 5),
+              decoration: pw.BoxDecoration(
+                color: const PdfColor(0.94, 0.94, 0.94),
+                border: pw.Border.all(color: PdfColors.grey700, width: 0.8),
+              ),
+              child: pw.Text(
+                'Petrischale ${dish + 1}.',
+                style: pw.TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  pw.Widget _buildPrintDayTable(int day) {
+    return pw.Table(
+      border: pw.TableBorder.all(color: PdfColors.grey700, width: 0.8),
+      defaultVerticalAlignment: pw.TableCellVerticalAlignment.middle,
+      columnWidths: const {
+        0: pw.FixedColumnWidth(24),
+        1: pw.FlexColumnWidth(),
+        2: pw.FlexColumnWidth(),
+        3: pw.FlexColumnWidth(),
+        4: pw.FlexColumnWidth(),
+        5: pw.FlexColumnWidth(),
+        6: pw.FlexColumnWidth(),
+      },
+      children: [
+        pw.TableRow(
+          decoration: const pw.BoxDecoration(color: PdfColor(0.95, 0.95, 0.95)),
+          children: [
+            _buildPrintTableCell('', bold: true),
+            _buildPrintTableCell('Grafts', bold: true),
+            _buildPrintTableCell('Haare', bold: true),
+            _buildPrintTableCell('Grafts', bold: true),
+            _buildPrintTableCell('Haare', bold: true),
+            _buildPrintTableCell('Grafts', bold: true),
+            _buildPrintTableCell('Haare', bold: true),
+          ],
+        ),
+        for (int row = 0; row < 6; row++)
+          pw.TableRow(
+            children: [
+              _buildPrintTableCell('${row + 1}', bold: true, fontSize: 10.5),
+              for (int dish = 0; dish < 3; dish++) ...[
+                _buildPrintTableCell(
+                  _graftText(day, dish, row),
+                  background: const PdfColor(0.98, 0.97, 0.82),
+                  alignment: pw.Alignment.centerRight,
+                ),
+                _buildPrintTableCell(
+                  '${_hairValue(day, dish, row)}',
+                  alignment: pw.Alignment.centerRight,
+                ),
+              ],
+            ],
+          ),
+        pw.TableRow(
+          decoration: const pw.BoxDecoration(color: PdfColor(0.97, 0.97, 0.97)),
+          children: [
+            _buildPrintTableCell('Z:', bold: true),
+            for (int dish = 0; dish < 3; dish++) ...[
+              _buildPrintTableCell(
+                '${_totalGraftsForDish(day, dish)}',
+                bold: true,
+                alignment: pw.Alignment.centerRight,
+              ),
+              _buildPrintTableCell(
+                '${_totalHairForDish(day, dish)}',
+                bold: true,
+                alignment: pw.Alignment.centerRight,
+              ),
+            ],
+          ],
+        ),
+        pw.TableRow(
+          children: [
+            _buildPrintTableCell('V:', bold: true),
+            for (int dish = 0; dish < 3; dish++) ...[
+              _buildPrintTableCell(
+                _ratioText(
+                  _totalGraftsForDish(day, dish),
+                  _ratioForDish(day, dish),
+                ),
+                bold: true,
+                alignment: pw.Alignment.center,
+              ),
+              _buildPrintTableCell(''),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+
+  pw.Widget _buildPrintTableCell(
+    String text, {
+    bool bold = false,
+    double fontSize = 10,
+    PdfColor? background,
+    pw.Alignment alignment = pw.Alignment.center,
+  }) {
+    return pw.Container(
+      alignment: alignment,
+      color: background,
+      padding: const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+      child: pw.Text(
+        text,
+        style: pw.TextStyle(
+          fontSize: fontSize,
+          fontWeight: bold ? pw.FontWeight.bold : pw.FontWeight.normal,
+        ),
+      ),
+    );
+  }
+
+  pw.Widget _buildOverallPrintSummary() {
+    return pw.Container(
+      decoration: pw.BoxDecoration(
+        border: pw.Border.all(color: PdfColors.black, width: 2),
+      ),
+      padding: const pw.EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      child: pw.Row(
+        children: [
+          pw.Expanded(
+            child: _buildOverallPrintSummaryItem('Grafts', '${totalGrafts()}'),
+          ),
+          pw.Expanded(
+            child: _buildOverallPrintSummaryItem('Haare', '${totalHair()}'),
+          ),
+          pw.Expanded(
+            child: _buildOverallPrintSummaryItem(
+              'Verhältnis',
+              _ratioText(totalGrafts(), ratio()),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  pw.Widget _buildOverallPrintSummaryItem(String label, String value) {
+    return pw.Row(
+      children: [
+        pw.Text(
+          '$label:',
+          style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
+        ),
+        pw.SizedBox(width: 8),
+        pw.Text(
+          value,
+          style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+        ),
+      ],
+    );
+  }
   Future<void> _saveData() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('name', nameController.text);
