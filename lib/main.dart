@@ -810,55 +810,15 @@ class _GraftPageState extends State<GraftPage> {
   }
 
   Future<void> exportPDF() async {
-    final pdf = pw.Document();
-
-    pdf.addPage(
-      pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Text('Graft Zähler Bericht',
-                  style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
-              pw.SizedBox(height: 20),
-              pw.Text('Name: ${nameController.text}'),
-              pw.Text('Entnahmenadel: ${needleController.text}'),
-              pw.SizedBox(height: 20),
-              pw.Text('Zusammenfassung:',
-                  style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
-              pw.Text('Gesamt Grafts: ${totalGrafts()}'),
-              pw.Text('Gesamt Haare: ${totalHair()}'),
-              pw.Text('Verhältnis: ${ratio().toStringAsFixed(2)}'),
-              pw.SizedBox(height: 20),
-              pw.Text('Details:',
-                  style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
-              pw.SizedBox(height: 10),
-              pw.Table.fromTextArray(
-                headers: ['Tag', 'Petrischale', 'Zeile', 'Grafts', 'Haare'],
-                data: _buildTableData(),
-                cellAlignment: pw.Alignment.centerLeft,
-                headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                headerDecoration: const pw.BoxDecoration(color: PdfColors.grey300),
-                cellPadding: const pw.EdgeInsets.all(5),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-
     final dir = await getApplicationDocumentsDirectory();
     final file = File('${dir.path}/graft_export.pdf');
-    await file.writeAsBytes(await pdf.save());
+    await file.writeAsBytes(await _buildReportPdf(PdfPageFormat.a4.landscape));
 
     if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('PDF Export gespeichert')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('PDF Export gespeichert')));
   }
-
   Future<void> printDocument() async {
     final pdf = pw.Document();
 
