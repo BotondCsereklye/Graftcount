@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
@@ -200,6 +201,7 @@ class _GraftPageState extends State<GraftPage> {
   final nameController = TextEditingController();
   final needleController = TextEditingController();
   bool _dataLoaded = false;
+  late final Future<pw.ThemeData> _pdfThemeFuture = _loadPdfTheme();
 
   final List<List<List<TextEditingController>>> grafts =
       List.generate(2, (_) =>
