@@ -939,19 +939,34 @@ class _GraftPageState extends State<GraftPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildSummaryItemSized('Grafts', '${totalGraftsForDay(day)}', daySummaryLabelFontSize, daySummaryValueFontSize),
+              _buildSummaryItemSized(
+                'Grafts',
+                '${totalGraftsForDay(day)}',
+                daySummaryLabelFontSize,
+                daySummaryValueFontSize,
+              ),
               Container(
                 width: 1,
                 height: 40,
-                color: Colors.white.withOpacity(0.25),
+                color: Colors.white.withValues(alpha: 0.25),
               ),
-              _buildSummaryItemSized('Haare', '${totalHairForDay(day)}', daySummaryLabelFontSize, daySummaryValueFontSize),
+              _buildSummaryItemSized(
+                'Haare',
+                '${totalHairForDay(day)}',
+                daySummaryLabelFontSize,
+                daySummaryValueFontSize,
+              ),
               Container(
                 width: 1,
                 height: 40,
-                color: Colors.white.withOpacity(0.25),
+                color: Colors.white.withValues(alpha: 0.25),
               ),
-              _buildSummaryItemSized('Verhältnis', ratioForDay(day).toStringAsFixed(2), daySummaryLabelFontSize, daySummaryValueFontSize),
+              _buildSummaryItemSized(
+                'Verhältnis',
+                ratioForDay(day).toStringAsFixed(2),
+                daySummaryLabelFontSize,
+                daySummaryValueFontSize,
+              ),
             ],
           ),
         ],
@@ -960,12 +975,6 @@ class _GraftPageState extends State<GraftPage> {
   }
 
   Widget buildPetriDish(int day, int petri, double width) {
-    // width bereits berücksichtigt: 12px padding left + 12px padding right = 24px
-    // Card margin: 4px left + 4px right = 8px
-    // Verfügbare Breite für Inhalt: width - 24 - 8 = width - 32
-    final contentWidth = width - 32;
-    final fieldWidth = (contentWidth - 24) / 2; // 24 = 24px (row number) + 6px spacing
-    
     // Berechne Summen für diese Petrischale
     int totalGraftsForDish = 0;
     int totalHairForDish = 0;
@@ -974,27 +983,33 @@ class _GraftPageState extends State<GraftPage> {
       totalGraftsForDish += g;
       totalHairForDish += g * hairMultiplier(r);
     }
-    double ratioForDish = totalGraftsForDish == 0 ? 0 : totalHairForDish / totalGraftsForDish;
-    
+    double ratioForDish = totalGraftsForDish == 0
+        ? 0
+        : totalHairForDish / totalGraftsForDish;
+
     return SizedBox(
       width: width,
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
         elevation: 3,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 12,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF16325A),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFF2CCEF0), width: 1.2),
+                  border: Border.all(
+                    color: const Color(0xFF2CCEF0),
+                    width: 1.2,
+                  ),
                 ),
                 child: Text(
                   'Petrischale ${petri + 1}',
@@ -1013,7 +1028,10 @@ class _GraftPageState extends State<GraftPage> {
                 decoration: BoxDecoration(
                   color: const Color(0xFF102745),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFF2CCEF0).withOpacity(0.3), width: 1),
+                  border: Border.all(
+                    color: const Color(0xFF2CCEF0).withValues(alpha: 0.3),
+                    width: 1,
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -1145,7 +1163,10 @@ class _GraftPageState extends State<GraftPage> {
                 decoration: BoxDecoration(
                   color: const Color(0xFF16325A),
                   borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: const Color(0xFF2CCEF0).withOpacity(0.5), width: 1),
+                  border: Border.all(
+                    color: const Color(0xFF2CCEF0).withValues(alpha: 0.5),
+                    width: 1,
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -1190,7 +1211,10 @@ class _GraftPageState extends State<GraftPage> {
                 decoration: BoxDecoration(
                   color: const Color(0xFF16325A),
                   borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: const Color(0xFF2CCEF0).withOpacity(0.5), width: 1),
+                  border: Border.all(
+                    color: const Color(0xFF2CCEF0).withValues(alpha: 0.5),
+                    width: 1,
+                  ),
                 ),
                 child: Row(
                   children: [
