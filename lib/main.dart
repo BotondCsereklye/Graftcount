@@ -102,7 +102,8 @@ class GraftZaehlerApp extends StatefulWidget {
   State<GraftZaehlerApp> createState() => _GraftZaehlerAppState();
 }
 
-class _GraftZaehlerAppState extends State<GraftZaehlerApp> with WidgetsBindingObserver {
+class _GraftZaehlerAppState extends State<GraftZaehlerApp>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
@@ -203,21 +204,20 @@ class _GraftPageState extends State<GraftPage> {
   bool _dataLoaded = false;
   late final Future<pw.ThemeData> _pdfThemeFuture = _loadPdfTheme();
 
-  final List<List<List<TextEditingController>>> grafts =
-      List.generate(2, (_) =>
-        List.generate(3, (_) =>
-          List.generate(6, (_) => TextEditingController())
-        )
-      );
+  final List<List<List<TextEditingController>>> grafts = List.generate(
+    2,
+    (_) => List.generate(
+      3,
+      (_) => List.generate(6, (_) => TextEditingController()),
+    ),
+  );
 
-  final List<List<List<FocusNode>>> focusNodes =
-      List.generate(2, (_) =>
-        List.generate(3, (_) =>
-          List.generate(6, (_) => FocusNode())
-        )
-      );
+  final List<List<List<FocusNode>>> focusNodes = List.generate(
+    2,
+    (_) => List.generate(3, (_) => List.generate(6, (_) => FocusNode())),
+  );
 
-  // Schriftgrößen für die Tages-Gesamtzusammenfassung (anpassbar)
+  // Schriftgrössen für die Tages-Gesamtzusammenfassung (anpassbar)
   double daySummaryLabelFontSize = 13;
   double daySummaryValueFontSize = 18;
 
@@ -228,7 +228,7 @@ class _GraftPageState extends State<GraftPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadDataAsync();
     });
-    
+
     // Auto-save on text changes
     nameController.addListener(_saveData);
     needleController.addListener(_saveData);
@@ -683,6 +683,7 @@ class _GraftPageState extends State<GraftPage> {
       ],
     );
   }
+
   Future<void> _saveData() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('name', nameController.text);
@@ -701,9 +702,9 @@ class _GraftPageState extends State<GraftPage> {
     try {
       await Future.delayed(Duration(milliseconds: 100)); // Small delay
       final prefs = await SharedPreferences.getInstance();
-      
+
       if (!mounted) return;
-      
+
       nameController.text = prefs.getString('name') ?? '';
       needleController.text = prefs.getString('needle') ?? '';
 
@@ -754,9 +755,9 @@ class _GraftPageState extends State<GraftPage> {
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Fehler beim Zurücksetzen: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Fehler beim Zurücksetzen: $e')));
     }
   }
 
@@ -766,7 +767,9 @@ class _GraftPageState extends State<GraftPage> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Alle Daten löschen?'),
-          content: const Text('Möchtest du wirklich alle Daten löschen? Diese Aktion kann nicht rückgängig gemacht werden.'),
+          content: const Text(
+            'Möchtest du wirklich alle Daten löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -777,10 +780,7 @@ class _GraftPageState extends State<GraftPage> {
                 Navigator.of(context).pop();
                 await _performReset();
               },
-              child: const Text(
-                'Löschen',
-                style: TextStyle(color: Colors.red),
-              ),
+              child: const Text('Löschen', style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -804,9 +804,9 @@ class _GraftPageState extends State<GraftPage> {
 
     await file.writeAsString(csv);
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('CSV Export gespeichert')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('CSV Export gespeichert')));
   }
 
   Future<void> exportPDF() async {
@@ -819,6 +819,7 @@ class _GraftPageState extends State<GraftPage> {
       context,
     ).showSnackBar(const SnackBar(content: Text('PDF Export gespeichert')));
   }
+
   Future<void> printDocument() async {
     await showDialog<void>(
       context: context,
@@ -873,6 +874,7 @@ class _GraftPageState extends State<GraftPage> {
       },
     );
   }
+
   Widget _buildSummaryItemLarge(String label, String value) {
     return Column(
       children: [
@@ -897,7 +899,12 @@ class _GraftPageState extends State<GraftPage> {
     );
   }
 
-  Widget _buildSummaryItemSized(String label, String value, double labelSize, double valueSize) {
+  Widget _buildSummaryItemSized(
+    String label,
+    String value,
+    double labelSize,
+    double valueSize,
+  ) {
     return Column(
       children: [
         Text(
@@ -1091,8 +1098,14 @@ class _GraftPageState extends State<GraftPage> {
                           focusNode: focusNodes[day][petri][r],
                           controller: grafts[day][petri][r],
                           keyboardType: TextInputType.number,
-                          textInputAction: (day == 1 && petri == 2 && r == 5) ? TextInputAction.done : TextInputAction.next,
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+                          textInputAction: (day == 1 && petri == 2 && r == 5)
+                              ? TextInputAction.done
+                              : TextInputAction.next,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
                           textAlign: TextAlign.center,
                           decoration: InputDecoration(
                             filled: true,
@@ -1104,15 +1117,24 @@ class _GraftPageState extends State<GraftPage> {
                             isDense: true,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Color(0xFF2CCEF0), width: 1.4),
+                              borderSide: const BorderSide(
+                                color: Color(0xFF2CCEF0),
+                                width: 1.4,
+                              ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Colors.white24, width: 1.2),
+                              borderSide: BorderSide(
+                                color: Colors.white24,
+                                width: 1.2,
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Colors.white, width: 1.8),
+                              borderSide: const BorderSide(
+                                color: Colors.white,
+                                width: 1.8,
+                              ),
                             ),
                           ),
                           onSubmitted: (_) async {
@@ -1135,11 +1157,17 @@ class _GraftPageState extends State<GraftPage> {
                         child: Container(
                           height: 36,
                           alignment: Alignment.center,
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFF0F233D),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: const Color(0xFF2CCEF0), width: 1.3),
+                            border: Border.all(
+                              color: const Color(0xFF2CCEF0),
+                              width: 1.3,
+                            ),
                           ),
                           child: Text(
                             '${(int.tryParse(grafts[day][petri][r].text) ?? 0) * hairMultiplier(r)}',
@@ -1301,9 +1329,7 @@ class _GraftPageState extends State<GraftPage> {
                     Expanded(
                       child: TextField(
                         controller: nameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Name',
-                        ),
+                        decoration: const InputDecoration(labelText: 'Name'),
                         onChanged: (_) => _saveData(),
                       ),
                     ),
@@ -1324,7 +1350,10 @@ class _GraftPageState extends State<GraftPage> {
                 LayoutBuilder(
                   builder: (context, constraints) {
                     final availableWidth = constraints.maxWidth;
-                    final petriWidth = (availableWidth / 6.5).clamp(125.0, 230.0);
+                    final petriWidth = (availableWidth / 6.5).clamp(
+                      125.0,
+                      230.0,
+                    );
                     return Center(
                       child: ClipRect(
                         child: InteractiveViewer(
@@ -1338,80 +1367,88 @@ class _GraftPageState extends State<GraftPage> {
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                            // Tag 1 Group
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                              Container(
-                                width: petriWidth * 3,
-                                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF2CCEF0),
-                                  borderRadius: BorderRadius.circular(12),
+                                // Tag 1 Group
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: petriWidth * 3,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 12,
+                                        horizontal: 16,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF2CCEF0),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: const Text(
+                                        'Tag 1',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF0B1C36),
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      children: [
+                                        buildPetriDish(0, 0, petriWidth),
+                                        buildPetriDish(0, 1, petriWidth),
+                                        buildPetriDish(0, 2, petriWidth),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      width: petriWidth * 3,
+                                      child: _buildDaySummary(0),
+                                    ),
+                                  ],
                                 ),
-                                child: const Text(
-                                  'Tag 1',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF0B1C36),
-                                  ),
-                                  textAlign: TextAlign.center,
+                                const SizedBox(width: 4),
+                                // Tag 2 Group
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: petriWidth * 3,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 12,
+                                        horizontal: 16,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF2CCEF0),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: const Text(
+                                        'Tag 2',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF0B1C36),
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      children: [
+                                        buildPetriDish(1, 0, petriWidth),
+                                        buildPetriDish(1, 1, petriWidth),
+                                        buildPetriDish(1, 2, petriWidth),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      width: petriWidth * 3,
+                                      child: _buildDaySummary(1),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  buildPetriDish(0, 0, petriWidth),
-                                  buildPetriDish(0, 1, petriWidth),
-                                  buildPetriDish(0, 2, petriWidth),
-                                ],
-                              ),
-                              SizedBox(
-                                width: petriWidth * 3,
-                                child: _buildDaySummary(0),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          const SizedBox(width: 4),
-                          // Tag 2 Group
-                          Column(                              crossAxisAlignment: CrossAxisAlignment.start,                            children: [
-                              Container(
-                                width: petriWidth * 3,
-                                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF2CCEF0),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Text(
-                                  'Tag 2',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF0B1C36),
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  buildPetriDish(1, 0, petriWidth),
-                                  buildPetriDish(1, 1, petriWidth),
-                                  buildPetriDish(1, 2, petriWidth),
-                                ],
-                              ),
-                              SizedBox(
-                                width: petriWidth * 3,
-                                child: _buildDaySummary(1),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
                         ),
                       ),
-                        ),
                     );
                   },
                 ),
@@ -1430,7 +1467,10 @@ class _GraftPageState extends State<GraftPage> {
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: const Color(0xFF2CCEF0), width: 1.2),
+                      border: Border.all(
+                        color: const Color(0xFF2CCEF0),
+                        width: 1.2,
+                      ),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -1448,19 +1488,25 @@ class _GraftPageState extends State<GraftPage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              _buildSummaryItemLarge('Grafts', '${totalGrafts()}'),
+                              _buildSummaryItemLarge(
+                                'Grafts',
+                                '${totalGrafts()}',
+                              ),
                               Container(
                                 width: 1,
                                 height: 50,
-                                color: Colors.white.withOpacity(0.25),
+                                color: Colors.white.withValues(alpha: 0.25),
                               ),
                               _buildSummaryItemLarge('Haare', '${totalHair()}'),
                               Container(
                                 width: 1,
                                 height: 50,
-                                color: Colors.white.withOpacity(0.25),
+                                color: Colors.white.withValues(alpha: 0.25),
                               ),
-                              _buildSummaryItemLarge('Verhältnis', ratio().toStringAsFixed(2)),
+                              _buildSummaryItemLarge(
+                                'Verhältnis',
+                                ratio().toStringAsFixed(2),
+                              ),
                             ],
                           ),
                         ],
@@ -1481,7 +1527,10 @@ class _GraftPageState extends State<GraftPage> {
                           icon: const Icon(Icons.table_chart, size: 22),
                           label: const Text(
                             'CSV Export',
-                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF2CCEF0),
@@ -1500,13 +1549,24 @@ class _GraftPageState extends State<GraftPage> {
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: OutlinedButton.icon(
                           onPressed: exportPDF,
-                          icon: const Icon(Icons.picture_as_pdf, size: 22, color: Color(0xFF2CCEF0)),
+                          icon: const Icon(
+                            Icons.picture_as_pdf,
+                            size: 22,
+                            color: Color(0xFF2CCEF0),
+                          ),
                           label: const Text(
                             'PDF Export',
-                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF2CCEF0)),
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF2CCEF0),
+                            ),
                           ),
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFF2CCEF0), width: 1.4),
+                            side: const BorderSide(
+                              color: Color(0xFF2CCEF0),
+                              width: 1.4,
+                            ),
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
