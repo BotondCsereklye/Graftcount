@@ -820,94 +820,59 @@ class _GraftPageState extends State<GraftPage> {
     ).showSnackBar(const SnackBar(content: Text('PDF Export gespeichert')));
   }
   Future<void> printDocument() async {
-    final pdf = pw.Document();
-
-    pdf.addPage(
-      pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Text('Graft Zähler Bericht',
-                  style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
-              pw.SizedBox(height: 20),
-              pw.Text('Name: ${nameController.text}'),
-              pw.Text('Entnahmenadel: ${needleController.text}'),
-              pw.SizedBox(height: 20),
-              pw.Text('Zusammenfassung:',
-                  style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
-              pw.Text('Gesamt Grafts: ${totalGrafts()}'),
-              pw.Text('Gesamt Haare: ${totalHair()}'),
-              pw.Text('Verhältnis: ${ratio().toStringAsFixed(2)}'),
-              pw.SizedBox(height: 20),
-              pw.Text('Details:',
-                  style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
-              pw.SizedBox(height: 10),
-              pw.Table.fromTextArray(
-                headers: ['Tag', 'Petrischale', 'Zeile', 'Grafts', 'Haare'],
-                data: _buildTableData(),
-                cellAlignment: pw.Alignment.centerLeft,
-                headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                headerDecoration: const pw.BoxDecoration(color: PdfColors.grey300),
-                cellPadding: const pw.EdgeInsets.all(5),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdf.save(),
-    );
-  }
-
-  List<List<String>> _buildTableData() {
-    List<List<String>> data = [];
-    for (int d = 0; d < 2; d++) {
-      for (int p = 0; p < 3; p++) {
-        for (int r = 0; r < 6; r++) {
-          int g = int.tryParse(grafts[d][p][r].text) ?? 0;
-          if (g > 0) {
-            data.add([
-              '${d + 1}',
-              '${p + 1}',
-              '${r + 1}',
-              '$g',
-              '${g * hairMultiplier(r)}',
-            ]);
-          }
-        }
-      }
-    }
-    return data;
-  }
-
-  Widget _buildSummaryItem(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 11,
-            color: Colors.white70,
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        final size = MediaQuery.sizeOf(dialogContext);
+        return Dialog(
+          insetPadding: const EdgeInsets.all(16),
+          child: SizedBox(
+            width: size.width > 1100 ? 1000 : size.width * 0.95,
+            height: size.height > 900 ? 780 : size.height * 0.9,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 12, 12),
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          'Druckvorschau',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.of(dialogContext).pop(),
+                        icon: const Icon(Icons.close),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1),
+                Expanded(
+                  child: PdfPreview(
+                    build: _buildReportPdf,
+                    initialPageFormat: PdfPageFormat.a4.landscape,
+                    canChangePageFormat: false,
+                    canChangeOrientation: false,
+                    allowSharing: false,
+                    canDebug: false,
+                    maxPageWidth: 900,
+                    pdfFileName: 'graft_bericht.pdf',
+                    previewPageMargin: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(16),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
-
   Widget _buildSummaryItemLarge(String label, String value) {
     return Column(
       children: [
