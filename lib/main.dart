@@ -1235,7 +1235,7 @@ class _GraftPageState extends State<GraftPage> {
         toolbarHeight: 70,
         elevation: 0,
         title: const Text(
-          'Graft Tracker',
+          'Graft Zähler',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
