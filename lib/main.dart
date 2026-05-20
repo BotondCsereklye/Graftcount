@@ -803,6 +803,7 @@ class _GraftPageState extends State<GraftPage> {
     }
 
     await file.writeAsString(csv);
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('CSV Export gespeichert')),
     );
@@ -850,6 +851,8 @@ class _GraftPageState extends State<GraftPage> {
     final dir = await getApplicationDocumentsDirectory();
     final file = File('${dir.path}/graft_export.pdf');
     await file.writeAsBytes(await pdf.save());
+
+    if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('PDF Export gespeichert')),
