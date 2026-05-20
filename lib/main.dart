@@ -137,7 +137,6 @@ class _GraftZaehlerAppState extends State<GraftZaehlerApp> with WidgetsBindingOb
           primary: Color(0xFF1C3D6E),
           secondary: Color(0xFF2CCEF0),
           surface: Color(0xFF102745),
-          background: Color(0xFF0B1C36),
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFF0F2B4F),
