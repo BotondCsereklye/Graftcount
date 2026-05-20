@@ -9,17 +9,15 @@ import 'package:printing/printing.dart';
 // Custom Logo Widget
 class GraftCountLogo extends StatelessWidget {
   final double size;
-  
-  const GraftCountLogo({Key? key, this.size = 40}) : super(key: key);
+
+  const GraftCountLogo({super.key, this.size = 40});
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: GraftLogoPainter(),
-      size: Size(size, size),
-    );
+    return CustomPaint(painter: GraftLogoPainter(), size: Size(size, size));
   }
 }
+
 class GraftLogoPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
