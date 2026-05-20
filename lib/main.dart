@@ -745,12 +745,15 @@ class _GraftPageState extends State<GraftPage> {
         if (await pdf.exists()) await pdf.delete();
       } catch (_) {}
 
+      if (!mounted) return;
+
       setState(() {});
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Alle Daten wurden zurückgesetzt')),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Fehler beim Zurücksetzen: $e')),
       );
